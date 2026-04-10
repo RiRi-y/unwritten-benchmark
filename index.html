@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Unwritten Benchmark</title>
+    <style>
+        :root {
+            --bg: #f6f4ef;
+            --paper: #fffdf9;
+            --ink: #171717;
+            --muted: #626262;
+            --line: #dad4c8;
+            --accent: #222222;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            font-family: Georgia, "Times New Roman", Times, serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at top, rgba(255, 255, 255, 0.9), transparent 32rem),
+                var(--bg);
+            line-height: 1.7;
+        }
+
+        a {
+            color: inherit;
+        }
+
+        .page {
+            width: min(1040px, calc(100% - 2rem));
+            margin: 0 auto;
+            padding: 3rem 0 4rem;
+        }
+
+        .hero,
+        .section {
+            background: var(--paper);
+            border: 1px solid var(--line);
+        }
+
+        .hero {
+            padding: 3rem 2rem 2.5rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .kicker {
+            margin: 0 0 1rem;
+            font-size: 0.82rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-weight: 600;
+            line-height: 1.2;
+            margin: 0;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 4vw, 3.3rem);
+            max-width: 15ch;
+            margin: 0 auto 1rem;
+        }
+
+        h2 {
+            font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+            margin-bottom: 0.85rem;
+        }
+
+        p {
+            margin: 0;
+        }
+
+        .subtitle {
+            max-width: 48rem;
+            margin: 0 auto;
+            color: var(--muted);
+            font-size: 1.03rem;
+        }
+
+        .authors,
+        .affiliation {
+            margin-top: 1.1rem;
+            font-size: 1rem;
+        }
+
+        .authors {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.5rem 1.25rem;
+        }
+
+        .affiliation {
+            color: var(--muted);
+        }
+
+        .links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.85rem;
+            margin-top: 1.6rem;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 0.78rem 1.05rem;
+            border: 1px solid var(--accent);
+            text-decoration: none;
+            font-size: 0.95rem;
+            letter-spacing: 0.01em;
+            transition: background-color 0.18s ease, color 0.18s ease;
+        }
+
+        .button:hover {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .section {
+            padding: 1.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .lead {
+            font-size: 1.02rem;
+            color: var(--muted);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 0.9rem;
+            margin-top: 1.3rem;
+        }
+
+        .stat {
+            border: 1px solid var(--line);
+            padding: 1rem;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+        .stat strong {
+            display: block;
+            font-size: 1.35rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .stat span {
+            display: block;
+            color: var(--muted);
+            font-size: 0.88rem;
+            line-height: 1.45;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1.25fr 0.95fr;
+            gap: 1.5rem;
+        }
+
+        .callout {
+            border-left: 3px solid var(--accent);
+            padding-left: 1rem;
+            color: var(--muted);
+        }
+
+        .sample-grid {
+            display: grid;
+            gap: 1rem;
+            margin-top: 1.35rem;
+        }
+
+        .sample-card {
+            border: 1px solid var(--line);
+            padding: 1.15rem;
+            background: rgba(255, 255, 255, 0.55);
+        }
+
+        .sample-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            align-items: baseline;
+            flex-wrap: wrap;
+            margin-bottom: 0.9rem;
+        }
+
+        .sample-label {
+            color: var(--muted);
+            font-size: 0.92rem;
+        }
+
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.9rem;
+        }
+
+        .media-panel {
+            border: 1px solid var(--line);
+            padding: 0.85rem;
+            background: #fff;
+        }
+
+        .media-panel h4 {
+            font-size: 0.95rem;
+            margin-bottom: 0.6rem;
+        }
+
+        video,
+        audio {
+            width: 100%;
+        }
+
+        video {
+            display: block;
+            background: #ece7dc;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+            margin-top: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.96rem;
+        }
+
+        th,
+        td {
+            border: 1px solid var(--line);
+            padding: 0.8rem 0.9rem;
+            text-align: left;
+        }
+
+        th {
+            background: #f3efe6;
+            font-weight: 600;
+        }
+
+        .note {
+            margin-top: 0.8rem;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .citation {
+            border: 1px solid var(--line);
+            background: #faf8f2;
+            padding: 1rem;
+            overflow-x: auto;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 0.92rem;
+            line-height: 1.5;
+            white-space: pre;
+            margin-top: 0.95rem;
+        }
+
+        footer {
+            color: var(--muted);
+            text-align: center;
+            font-size: 0.92rem;
+            padding-top: 0.3rem;
+        }
+
+        @media (max-width: 900px) {
+            .stats,
+            .media-grid,
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+
+            .hero,
+            .section {
+                padding: 1.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="page">
+        <section class="hero">
+            <p class="kicker">CVPR 2026 Findings</p>
+            <h1>The Unwritten Benchmark</h1>
+            <p class="subtitle"> 
+                A benchmark for acousto-kinematic word inference, where models must infer written words
+                from pen-scratch audio and hand motion alone, without any visible ink trace. 
+            </p>
+            <div class="authors">
+                <a href="mailto:arya.yadav@asu.edu" style="text-decoration: none;">Garima Arya Yadav</a>
+                <span>Nilay Yilmaz</span>
+                <span>Yezhou Yang</span>
+            </div>
+            <p class="affiliation">Arizona State University</p>
+            <div class="links">
+                <a class="button" href="unwritten-benchmark-paper.pdf">Paper PDF</a>
+                <a class="button" href="https://huggingface.co/datasets/RiRi-y/unwritten-benchmark">🤗 Hugging Face Dataset</a>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Abstract</h2>
+            <p>
+                Current multimodal models have demonstrated remarkable proficiency in recognizing static
+                visual and auditory content. However, their capacity for abstract perceptual reasoning,
+                inferring unseen information from dynamic, generative processes, remains a critical and
+                underexplored frontier. We introduce The Unwritten Benchmark, a new challenge designed to
+                probe this ability through acousto-kinematic word inference: models must decipher words,
+                across three handwriting styles, being written solely from pen-scratch audio and hand
+                motion, without any visible ink trace. Our evaluation reveals a profound gap between human
+                and machine performance. Human participants achieve high ordered letter accuracy, while
+                leading multimodal models struggle to surpass 10%. We also observe a paradoxical fusion
+                effect, where providing both modalities can degrade performance rather than improve it,
+                highlighting fundamental weaknesses in current multimodal reasoning.
+            </p>
+        </section>
+
+        <section class="section">
+            <h2>Benchmark at a Glance</h2>
+            <p class="lead">
+                The benchmark isolates a simple but cognitively demanding question: can a model recover
+                the symbolic output of writing by reasoning over the physical process that produced it?
+            </p>
+            <div class="stats">
+                <div class="stat">
+                    <strong>3</strong>
+                    <span>writing styles<br>Standard, Cursive, Retrace</span>
+                </div>
+                <div class="stat">
+                    <strong>3</strong>
+                    <span>modalities<br>Audio, Muted Video, Audio+Video</span>
+                </div>
+                <div class="stat">
+                    <strong>409</strong>
+                    <span>letter-level primitive files used as building blocks</span>
+                </div>
+                <div class="stat">
+                    <strong>10,491</strong>
+                    <span>synthetic benchmark files generated for evaluation</span>
+                </div>
+                <div class="stat">
+                    <strong>80.78%</strong>
+                    <span>human ordered letter accuracy on muted video</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="two-column">
+                <div>
+                    <h2>Task Overview</h2>
+                    <p>
+                        Each sample presents handwriting with no visible ink. The only available clues are
+                        the micro-kinematics of the hand and the sound of the pen interacting with paper.
+                        Word-level samples are synthesized by concatenating live-recorded letter primitives
+                        within a single writing style, enabling scalable generation while preserving the
+                        original motion and audio characteristics.
+                    </p>
+                </div>
+                <div class="callout">
+                    Humans reliably use these signals to infer the written word, but state-of-the-art
+                    multimodal models still fail by a wide margin, especially when they must integrate both
+                    modalities into a single judgment.
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Selected Samples</h2>
+            <p class="lead">
+                The examples below show the benchmark format across styles and modalities. Each row
+                contains a muted video sample, its corresponding audio-only recording, and the synchronized
+                audio-video version.
+            </p>
+
+            <div class="sample-grid">
+                <article class="sample-card">
+                    <div class="sample-header">
+                        <h3>Standard Style</h3>
+                        <span class="sample-label">Word sample: “above”</span>
+                    </div>
+                    <div class="media-grid">
+                        <div class="media-panel">
+                            <h4>Muted Video</h4>
+                            <video controls playsinline preload="metadata">
+                                <source src="samples/standard:%20above/above_muted.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                        <div class="media-panel">
+                            <h4>Audio Only</h4>
+                            <audio controls preload="metadata">
+                                <source src="samples/standard:%20above/above.mp3" type="audio/mpeg">
+                            </audio>
+                        </div>
+                        <div class="media-panel">
+                            <h4>Audio + Video</h4>
+                            <video controls playsinline preload="metadata">
+                                <source src="samples/standard:%20above/above.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="sample-card">
+                    <div class="sample-header">
+                        <h3>Cursive Style</h3>
+                        <span class="sample-label">Word sample: “above”</span>
+                    </div>
+                    <div class="media-grid">
+                        <div class="media-panel">
+                            <h4>Muted Video</h4>
+                            <video controls playsinline preload="metadata">
+                                <source src="samples/cursive:%20above/above_muted.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                        <div class="media-panel">
+                            <h4>Audio Only</h4>
+                            <audio controls preload="metadata">
+                                <source src="samples/cursive:%20above/above.mp3" type="audio/mpeg">
+                            </audio>
+                        </div>
+                        <div class="media-panel">
+                            <h4>Audio + Video</h4>
+                            <video controls playsinline preload="metadata">
+                                <source src="samples/cursive:%20above/above.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="sample-card">
+                    <div class="sample-header">
+                        <h3>Live Word Recording</h3>
+                        <span class="sample-label">Natural sample: “above”</span>
+                    </div>
+                    <div class="media-grid">
+                        <div class="media-panel">
+                            <h4>Muted Video</h4>
+                            <video controls playsinline preload="metadata">
+                                <source src="samples/live:%20above/above-1_muted.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                        <div class="media-panel">
+                            <h4>Audio Only</h4>
+                            <audio controls preload="metadata">
+                                <source src="samples/live:%20above/above-1.mp3" type="audio/mpeg">
+                            </audio>
+                        </div>
+                        <div class="media-panel">
+                            <h4>Audio + Video</h4>
+                            <video controls playsinline preload="metadata">
+                                <source src="samples/live:%20above/above-1.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="sample-card">
+                    <div class="sample-header">
+                        <h3>Retrace Style</h3>
+                        <span class="sample-label">Letter sample: “a”</span>
+                    </div>
+                    <div class="media-grid">
+                        <div class="media-panel">
+                            <h4>Muted Video</h4>
+                            <video controls playsinline preload="metadata">
+                                <source src="samples/retrace%20letter:%20a/a-3r_muted.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                        <div class="media-panel">
+                            <h4>Audio Only</h4>
+                            <audio controls preload="metadata">
+                                <source src="samples/retrace%20letter:%20a/a-3r.mp3" type="audio/mpeg">
+                            </audio>
+                        </div>
+                        <div class="media-panel">
+                            <h4>Audio + Video</h4>
+                            <video controls playsinline preload="metadata">
+                                <source src="samples/retrace%20letter:%20a/a-3r.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Key Results</h2>
+            <p class="lead">
+                Ordered Letter Accuracy (OLA) from the paper shows a striking human-machine gap and a
+                recurring multimodal fusion failure.
+            </p>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Model</th>
+                            <th>Audio</th>
+                            <th>Muted Video</th>
+                            <th>Audio + Video</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Human</td>
+                            <td>19.47</td>
+                            <td>80.78</td>
+                            <td>77.01</td>
+                        </tr>
+                        <tr>
+                            <td>Qwen2.5-Omni</td>
+                            <td>7.83</td>
+                            <td>5.03</td>
+                            <td>3.95</td>
+                        </tr>
+                        <tr>
+                            <td>GPT-4o</td>
+                            <td>8.87</td>
+                            <td>8.85</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td>Gemini 2.5 Pro</td>
+                            <td>10.04</td>
+                            <td>8.71</td>
+                            <td>9.07</td>
+                        </tr>
+                        <tr>
+                            <td>Gemini 2.5 Flash</td>
+                            <td>9.49</td>
+                            <td>8.38</td>
+                            <td>8.44</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="note">
+                GPT-4o Audio+Video results are omitted in the paper because the evaluation setup did not
+                support pre-merged AV files for that model.
+            </p>
+        </section>
+
+        <section class="section">
+            <h2>Why This Benchmark Matters</h2>
+            <p>
+                The Unwritten Benchmark shifts evaluation away from recognizing explicit content and toward
+                reasoning about a hidden outcome produced by a physical process. It highlights three
+                persistent challenges for current multimodal systems: weak understanding of continuous
+                motion, brittle cross-modal fusion, and limited causal reasoning over tightly synchronized
+                audiovisual signals.
+            </p>
+        </section>
+
+        <section class="section">
+            <h2>Citation</h2>
+            <p>If you find the dataset or paper useful, please cite:</p>
+            <div class="citation">@inproceedings{yadav2026unwritten,
+  title={The Unwritten Benchmark: A New Challenge for Multimodal Machine Learning in Abstract Perceptual Reasoning},
+  author={Yadav, Garima Arya and Yilmaz, Nilay and Yang, Yezhou},
+  booktitle={CVPR Findings},
+  year={2026}
+}</div>
+        </section>
+
+        <footer>
+            Project page for The Unwritten Benchmark.
+        </footer>
+    </main>
+</body>
+</html>
