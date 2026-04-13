@@ -681,24 +681,46 @@
                 return "";
             }
 
-            function showLocalCount(label) {
+            function showLocalCount() {
                 var storageKey = "unwritten-benchmark-local-visits";
-                var nextCount = 1;
+                var todayKey = new Date().toISOString().slice(0, 10);
+                var visits = {
+                    totalCount: 0,
+                    todayKey: todayKey,
+                    todayCount: 0
+                };
 
                 try {
-                    nextCount = Number(window.localStorage.getItem(storageKey) || "0") + 1;
-                    window.localStorage.setItem(storageKey, String(nextCount));
+                    var storedVisits = window.localStorage.getItem(storageKey);
+
+                    if (storedVisits) {
+                        if (storedVisits.charAt(0) === "{") {
+                            visits = JSON.parse(storedVisits);
+                        } else {
+                            visits.totalCount = Number(storedVisits) || 0;
+                        }
+                    }
+
+                    if (visits.todayKey !== todayKey) {
+                        visits.todayKey = todayKey;
+                        visits.todayCount = 0;
+                    }
+
+                    visits.totalCount = Number(visits.totalCount || 0) + 1;
+                    visits.todayCount = Number(visits.todayCount || 0) + 1;
+                    window.localStorage.setItem(storageKey, JSON.stringify(visits));
                 } catch (error) {
-                    nextCount = 1;
+                    visits.totalCount = 1;
+                    visits.todayCount = 1;
                 }
 
-                countEl.textContent = formatter.format(nextCount);
-                todayEl.textContent = label || "local";
+                countEl.textContent = formatter.format(visits.totalCount);
+                todayEl.textContent = formatter.format(visits.todayCount);
             }
 
             function recordVisit() {
                 if (!window.fetch || isPreview) {
-                    showLocalCount("preview");
+                    showLocalCount();
                     return;
                 }
 
@@ -737,7 +759,7 @@
                         }
                     })
                     .catch(function () {
-                        showLocalCount("browser");
+                        showLocalCount();
                     });
             }
         })();
