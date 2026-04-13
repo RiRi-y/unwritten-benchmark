@@ -283,6 +283,34 @@
             padding-top: 0.3rem;
         }
 
+        .visitor-tracker {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.35rem 0.7rem;
+            margin-top: 0.85rem;
+            padding: 0.45rem 0.65rem;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.55);
+            font-size: 0.82rem;
+            line-height: 1.45;
+        }
+
+        .visitor-tracker strong {
+            color: var(--ink);
+            font-weight: 600;
+        }
+
+        .visitor-tracker a {
+            text-decoration-thickness: 1px;
+            text-underline-offset: 0.18em;
+        }
+
+        .tracker-separator {
+            color: var(--line);
+        }
+
         @media (max-width: 900px) {
             .stats,
             .media-grid,
@@ -294,6 +322,14 @@
             .section {
                 padding: 1.4rem;
             }
+
+            .visitor-tracker {
+                display: flex;
+            }
+
+            .tracker-separator {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -301,9 +337,10 @@
     <main class="page">
         <section class="hero">
             <p class="kicker">CVPR 2026 Findings</p>
-            <h1>The Unwritten Benchmark:</h1>
+            <h1>The Unwritten Benchmark</h1>
             <p class="subtitle"> 
-                 A New Challenge for Multimodal Machine Learning in Abstract Perceptual Reasoning 
+                A benchmark for acousto-kinematic word inference, where models must infer written words
+                from pen-scratch audio and hand motion alone, without any visible ink trace. 
             </p>
             <div class="authors">
                 <a href="mailto:arya.yadav@asu.edu" style="text-decoration: none;">Garima Arya Yadav</a>
@@ -313,7 +350,7 @@
             <p class="affiliation">Arizona State University</p>
             <div class="links">
                 <a class="button" href="unwritten-benchmark-paper.pdf">Paper PDF</a>
-                <a class="button" href="https://huggingface.co/datasets/RiRi-y/unwritten-benchmark">🤗 Hugging Face</a>
+                <a class="button" href="https://huggingface.co/datasets/RiRi-y/unwritten-benchmark">🤗 Hugging Face Dataset</a>
             </div>
         </section>
 
@@ -582,8 +619,128 @@
         </section>
 
         <footer>
-            Project page for The Unwritten Benchmark.
+            <span>Project page for The Unwritten Benchmark.</span>
+            <div class="visitor-tracker" data-visitor-tracker aria-live="polite">
+                <span><strong id="visitor-count">...</strong> visits</span>
+                <span class="tracker-separator" aria-hidden="true">|</span>
+                <span>today: <strong id="visitor-today">...</strong></span>
+                <span class="tracker-separator" data-dashboard-separator aria-hidden="true" hidden>|</span>
+                <a data-dashboard-link href="#" hidden>stats</a>
+            </div>
         </footer>
     </main>
+    <script>
+        (function () {
+            var tracker = document.querySelector("[data-visitor-tracker]");
+            var countEl = document.getElementById("visitor-count");
+            var todayEl = document.getElementById("visitor-today");
+            var dashboardLink = document.querySelector("[data-dashboard-link]");
+            var dashboardSeparator = document.querySelector("[data-dashboard-separator]");
+
+            if (!tracker || !countEl || !todayEl) {
+                return;
+            }
+
+            var formatter = new Intl.NumberFormat();
+            var fallbackDomain = "unwritten-benchmark";
+            var host = window.location.hostname.replace(/^www\./, "");
+            var isPreview = !host || host === "localhost" || host === "127.0.0.1" || host === "0.0.0.0";
+            var domain = isPreview ? fallbackDomain : host;
+            var timezone = getTimezone();
+
+            recordVisit();
+
+            function getTimezone() {
+                try {
+                    return Intl.DateTimeFormat().resolvedOptions().timeZone || "Unknown";
+                } catch (error) {
+                    return "Unknown";
+                }
+            }
+
+            function getSearchQuery(referrer) {
+                if (!referrer) {
+                    return "";
+                }
+
+                try {
+                    var url = new URL(referrer);
+                    var hostName = url.hostname;
+
+                    if (hostName.indexOf("google.") !== -1 || hostName.indexOf("bing.") !== -1 || hostName.indexOf("duckduckgo.") !== -1) {
+                        return url.searchParams.get("q") || "";
+                    }
+
+                    if (hostName.indexOf("yahoo.") !== -1) {
+                        return url.searchParams.get("p") || "";
+                    }
+                } catch (error) {
+                    return "";
+                }
+
+                return "";
+            }
+
+            function showLocalCount(label) {
+                var storageKey = "unwritten-benchmark-local-visits";
+                var nextCount = 1;
+
+                try {
+                    nextCount = Number(window.localStorage.getItem(storageKey) || "0") + 1;
+                    window.localStorage.setItem(storageKey, String(nextCount));
+                } catch (error) {
+                    nextCount = 1;
+                }
+
+                countEl.textContent = formatter.format(nextCount);
+                todayEl.textContent = label || "local";
+            }
+
+            function recordVisit() {
+                if (!window.fetch || isPreview) {
+                    showLocalCount("preview");
+                    return;
+                }
+
+                fetch("https://visitor.6developer.com/visit", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        domain: domain,
+                        timezone: timezone,
+                        page_path: window.location.pathname || "/",
+                        page_title: document.title,
+                        referrer: document.referrer,
+                        search_query: getSearchQuery(document.referrer)
+                    })
+                })
+                    .then(function (response) {
+                        if (!response.ok) {
+                            throw new Error("Visitor counter failed");
+                        }
+
+                        return response.json();
+                    })
+                    .then(function (data) {
+                        countEl.textContent = typeof data.totalCount === "number" ? formatter.format(data.totalCount) : "0";
+                        todayEl.textContent = typeof data.todayCount === "number" ? formatter.format(data.todayCount) : "0";
+
+                        if (dashboardLink && data.dashboardUrl) {
+                            dashboardLink.href = data.dashboardUrl;
+                            dashboardLink.hidden = false;
+
+                            if (dashboardSeparator) {
+                                dashboardSeparator.hidden = false;
+                            }
+                        }
+                    })
+                    .catch(function () {
+                        showLocalCount("browser");
+                    });
+            }
+        })();
+    </script>
 </body>
 </html>
